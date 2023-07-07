@@ -66,17 +66,12 @@ def speak(text):
 
 
 def intro():
-    print("")
-    print("")
-    print("\t\t\t\t@ ************************************* @")
-    print("\t\t\t\t# ------------------------------------- #")
-    print("\t\t\t\t  ATM SYSTEM FOR THE VISUALLY IMPAIRED   ")
-    print("\t\t\t\t# ------------------------------------- #")
-    print("\t\t\t\t@ ************************************* @")
-    print("")
-    print("")
-    print("\t\t\t\tBrought To You By:")
-    print("\t\t\t\tMorpheus Softwares")
+    print("\t\t\t\t************************************")
+    print("\t\t\t\t------------------------------------")
+    print("\t\t\t\tATM SYSTEM FOR THE VISUALLY IMPAIRED")
+    print("\t\t\t\t------------------------------------")
+    print("\t\t\t\t************************************")
+    print("\t\t\t\t\tPowered by: Morpheus Softwares")
     input()
 
 
