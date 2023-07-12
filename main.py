@@ -80,7 +80,6 @@ wish()
 user = ""
 
 # Inputting and verifying pin and account number
-
 speak("Please enter your 10-digit account number.")
 flag1 = 1
 flag2 = 0
@@ -182,9 +181,7 @@ print(
 said = inputCommand()
 
 # Code for withdrawing money.
-
-if "Cash withdrawal" in said.lower() or "withdraw some cash" in said.lower() or "withdraw" in said.lower() \
-        or "Withdraw cash" in said.lower():
+if "withdraw" in said.lower() or "cash withdrawal" in said.lower():
     speak("You have chosen to withdraw cash.")
     print("Enter denomination.")
     speak("Say or enter the amount you want to withdraw.")
@@ -248,10 +245,8 @@ if "Cash withdrawal" in said.lower() or "withdraw some cash" in said.lower() or 
         exit()
 
 # Code for depositing cash.
-
-elif "Cash deposit" in said.lower() or "Deposit some cash" in said.lower() or "Deposit cash" in said.lower() \
-        or "Deposit" in said.lower():
-    speak("You have chosen to deposit cash, enter the amount to be deposited.")
+elif "deposit" in said.lower() or "cash deposit" in said.lower():
+    speak("You have chosen to deposit cash.")
     deposit = int(input("Enter the amount to deposit: "))
 
     with open("Files/Accounts.csv", 'r') as file:
@@ -304,8 +299,7 @@ elif "Cash deposit" in said.lower() or "Deposit some cash" in said.lower() or "D
         exit()
 
     # Code for checking balance.
-
-elif "Like to know balance" in said.lower() or "Balance inquiry" in said.lower() or "Balance" in said.lower():
+elif "balance" in said.lower() or "balance inquiry" in said.lower():
     speak("You have selected to check your balance.")
     with open("Files/Accounts.csv", 'r') as file:
         reader = csv.reader(file, delimiter=',')
@@ -318,6 +312,67 @@ elif "Like to know balance" in said.lower() or "Balance inquiry" in said.lower()
                 speak(f"Your balance is: {i[2]}")
                 print(f"Your balance is: {i[2]}")
 
+# Code for changing PIN.
+elif "change pin" in said.lower() or "change my pin" in said.lower():
+    speak("You have chosen to change your PIN.")
+    print("Please enter your old pin: ")
+    tries = 0
+    f = 1
+    while f == 1:
+        oldPin = input()
+        if oldPin != pin:  # Compare string values instead of integer values
+            speak("Your pin does not match, please enter your old pin again.")
+            print("Your pin does not match, please enter your old pin again:")
+            tries = tries + 1
+            if tries == 3:
+                speak("You have exceeded the maximum number of trials.")
+                exit()
+        else:
+            pinTrials = 0
+            while f == 1:
+                speak("Enter your new pin.")
+                print("Enter your new pin:")
+                newPin1 = input()
+                if newPin1.isdigit() and len(newPin1) == 4:
+                    speak("Please re-enter your new pin to confirm.")
+                    print("Please re-enter your new pin to confirm:")
+                    newPin2 = input()
+                    if newPin2.isdigit() and len(newPin2) == 4:
+                        if newPin1 == newPin2:
+                            with open("Files/Accounts.csv", 'r') as file:
+                                reader = csv.reader(file, delimiter=',')
+                                l = []
+                                for i in reader:
+                                    l.append(i)
+                                for i in l:
+                                    i[1] = int(i[1])
+                                    i[2] = float(i[2])
+                                    if i[1] == int(oldPin) and i[3] == accountNumber:
+                                        i[1] = int(newPin1)
+                                        f = 0
+                                        speak("Your new pin has been set successfully!")
+                                        print("Your new pin has been set successfully!")
+                                        speak(regards)
+                            file = open("Files/Accounts.csv", 'w', newline='')
+                            writer = csv.writer(file, delimiter=',')
+                            for i in range(len(l)):
+                                writer.writerow(l[i])
+                            file.close()
+                            exit()
+                        else:
+                            speak("The pin does not match, please try again.")
+                            pinTrials = pinTrials + 1
+                            if pinTrials == 3:
+                                speak("You have exceeded the maximum number of trials.")
+                                print("You have exceeded the maximum number of trials.")
+                                exit()
+                            print("The entered pin does not match, please try again.")
+
+    speak("Your new pin has been set successfully!")
+    print("Your new pin has been set successfully!")
+    speak(regards)
+
+    exit()
 
 else:
     speak("Sorry! The command you entered does not exist, you will be taken back to the main menu.")
