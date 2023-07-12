@@ -4,6 +4,9 @@ from gtts import gTTS
 import speech_recognition as sr
 import os
 import csv
+
+from pygame.examples.setmodescale import flag
+
 import getpass_asterisk
 import datetime
 
@@ -114,6 +117,8 @@ while flag1:
 
     while True:
         accountNumber = input("Enter your 10-digits account number:")
+        pin = 0000
+
         for i in l:
             if i[3] == accountNumber:
                 tries = tries + 1
@@ -137,7 +142,7 @@ while flag1:
         flag1 = 0
         speak("Please enter your 4-digits pin number.")
         print("Please enter your 4-digits pin number.")
-        while flag2 < 3:
+        while flag2 < 3 and flag1 == 1:  # 'and flag1 == 1' as suggested by AskYouTelegram
             try:
                 pin = getpass_asterisk.getpass()
 
@@ -155,16 +160,23 @@ while flag1:
                     print("Accepted!")
                     speak("Accepted!")
                 else:
-                    print("Pin does not match.")
-                    speak("Pin does not match.")
-                # continue to regular code
+                    print("Incorrect pin. Please try again.")
+                    speak("Incorrect pin. Please try again.")
+
+                    flag2 += 1  # From AskYourTelegram
+
+                # Continue to regular code
+
+                # 3 lines commented out below as suggested by AskYourTelegram
             else:
-                print("Please, end  your correct pin.")
-                speak("Please, end your correct pin.")
+                print("Please, enter  your correct pin.")
+                speak("Please, enter your correct pin.")
                 flag2 += 1
-                if flag2 == 3:
-                    speak("You have exceeded your maximum number of trials.")
-                    exit()
+
+            # The line below is shifted out by one indentation as suggested by AskYourTelegram
+            if flag2 == 3:
+                speak("You have exceeded your maximum number of trials.")
+                exit()
 
     else:
         speak("Please, enter a valid 10-digits account number.")
