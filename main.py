@@ -49,10 +49,10 @@ def inputCommand():
 def wish():
     hour = datetime.datetime.now().hour
 
-    if hour >= 0 and hour <= 12:
+    if 0 <= hour <= 12:
         speak("Good morning!")
 
-    elif hour >= 12 and hour < 18:
+    elif 12 <= hour < 18:
         speak("Good afternoon!")
 
     else:
@@ -71,6 +71,21 @@ def intro():
     print("\t\t\t\t------------------------------------")
     print("\t\t\t\t************************************")
     print("\t\t\t\t\tPowered by: Morpheus Softwares")
+
+
+def checkBalance():
+    print("Checking balance, please hold on...")
+    with open("Files/Accounts.csv", 'r') as file:
+        reader = csv.reader(file, delimiter=',')
+        for i in reader:
+            if i[1] == pin and i[3] == accountNumber:
+                balance = i[2]
+                speak(f"Your balance is: {balance}")
+                print(f"Your balance is: {balance}")
+                break  # Exit the loop once the balance is found
+        else:
+            speak("Balance not found for the user.")
+            print("Balance not found for the user.")
 
 
 intro()
@@ -103,8 +118,7 @@ while flag1:
         tries = 0
 
     while True:
-        accountNumber = input("Enter your 10-digit account number:")
-        # pin = "0000"
+        accountNumber = int(input("Enter your 10-digit account number: "))
 
         for i in l:
             if i[3] == accountNumber:
@@ -125,20 +139,20 @@ while flag1:
             print("Account number exists.")
             break
 
-    if accountNumber.isdigit() and len(accountNumber) == 10:
+    if len(str(accountNumber)) == 10:
         flag1 = 0
         speak("Please enter your 4-digit PIN number.")
         print("Please enter your 4-digit PIN number.")
         while flag2 < 3 and flag1 == 0:
             try:
-                pin = input()
+                pin = int(input())
 
             except Exception as error:
                 print("Error: " + error)
                 speak("Error")
 
-            if pin.isdigit() and len(pin) == 4 and int(pin) in l1:
-                if l1.index(int(pin)) == l2.index(int(accountNumber)):
+            if len(str(pin)) == 4 and pin in l1:
+                if l1.index(pin) == l2.index(accountNumber):
                     print("Accepted!")
                     speak("Accepted!")
                     flag1 = 0  # Set flag1 to 0 to continue the program execution
@@ -183,7 +197,7 @@ said = inputCommand()
 # Code for withdrawing money.
 if "withdraw" in said.lower() or "cash withdrawal" in said.lower():
     speak("You have chosen to withdraw cash.")
-    print("Enter denomination.")
+    # print("Enter denomination.")
     speak("Say or enter the amount you want to withdraw.")
 
     with open("Files/Accounts.csv", 'r') as file:
@@ -198,7 +212,7 @@ if "withdraw" in said.lower() or "cash withdrawal" in said.lower():
 
     trials = 0
     for i in l:
-        if i[1] == int(pin):
+        if i[1] == pin:
             print(i[2])
             while True:
                 amount = int(input())
@@ -228,17 +242,7 @@ if "withdraw" in said.lower() or "cash withdrawal" in said.lower():
 
     if "Yes" in reply.lower() or "Yes please" in reply.lower() or "Yeah" in reply.lower() \
             or "Yes I would like to know my balance" in reply.lower():
-        with open("Files/Accounts.csv", 'r') as file:
-            reader = csv.reader(file, delimiter=',')
-            a = []
-            for i in reader:
-                a.append(i)
-
-            for i in a:
-                if i[1] == int(pin):
-                    speak(f"Your balance is: {i[2]}")
-                    print(f"Your balance is: {i[2]}")
-
+        checkBalance()
     else:
         file.close()
         speak(regards)
@@ -260,7 +264,7 @@ elif "deposit" in said.lower() or "cash deposit" in said.lower():
             i[2] = float(i[2])
 
         for i in l:
-            if i[1] == int(pin):
+            if i[1] == pin:
                 while True:
                     if deposit > 20000:
                         print("Please enter a valid amount to be deposited.")
@@ -284,17 +288,7 @@ elif "deposit" in said.lower() or "cash deposit" in said.lower():
         speak(regards)
         exit()
     else:
-        with open("Files/Accounts.csv", 'r') as file:
-            reader = csv.reader(file, delimiter=',')
-            a = []
-            for i in reader:
-                a.append(i)
-
-            for i in a:
-                if i[1] == int(pin):
-                    speak(f"Your balance is {i[2]}")
-                    print(f"Your balance is {i[2]}")
-
+        checkBalance()
         speak(regards)
         exit()
 
@@ -302,20 +296,7 @@ elif "deposit" in said.lower() or "cash deposit" in said.lower():
 # Code for checking balance.
 elif "balance" in said.lower() or "balance inquiry" in said.lower():
     speak("You have selected to check your balance.")
-    print("Checking balance...")
-    print(f"User PIN: {pin}")
-    print(f"Account Number: {accountNumber}")
-    with open("Files/Accounts.csv", 'r') as file:
-        reader = csv.reader(file, delimiter=',')
-        for i in reader:
-            if i[1] == int(pin) and i[3] == accountNumber:
-                balance = i[2]
-                print(f"Balance found: {balance}")
-                speak(f"Your balance is: {balance}")
-                print(f"Your balance is: {balance}")
-                break  # Exit the loop once the balance is found
-        else:
-            print("Balance not found for the user.")
+    checkBalance()
 
 
 # Code for changing PIN.
@@ -325,8 +306,8 @@ elif "change pin" in said.lower() or "change my pin" in said.lower():
     tries = 0
     f = 1
     while f == 1:
-        oldPin = input()
-        if oldPin != pin:  # Compare string values instead of integer values
+        oldPin = int(input())
+        if oldPin != pin:
             speak("Your pin does not match, please enter your old pin again.")
             print("Your pin does not match, please enter your old pin again:")
             tries = tries + 1
@@ -338,12 +319,12 @@ elif "change pin" in said.lower() or "change my pin" in said.lower():
             while f == 1:
                 speak("Enter your new pin.")
                 print("Enter your new pin:")
-                newPin1 = input()
-                if newPin1.isdigit() and len(newPin1) == 4:
+                newPin1 = int(input())
+                if len(str(newPin1)) == 4:
                     speak("Please re-enter your new pin to confirm.")
                     print("Please re-enter your new pin to confirm:")
-                    newPin2 = input()
-                    if newPin2.isdigit() and len(newPin2) == 4:
+                    newPin2 = int(input())
+                    if len(str(newPin2)) == 4:
                         if newPin1 == newPin2:
                             with open("Files/Accounts.csv", 'r') as file:
                                 reader = csv.reader(file, delimiter=',')
@@ -353,8 +334,8 @@ elif "change pin" in said.lower() or "change my pin" in said.lower():
                                 for i in l:
                                     i[1] = int(i[1])
                                     i[2] = float(i[2])
-                                    if i[1] == int(oldPin) and i[3] == accountNumber:
-                                        i[1] = int(newPin1)
+                                    if i[1] == oldPin and i[3] == accountNumber:
+                                        i[1] = newPin1
                                         f = 0
                                         speak("Your new pin has been set successfully!")
                                         print("Your new pin has been set successfully!")
