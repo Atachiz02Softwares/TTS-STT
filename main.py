@@ -293,6 +293,8 @@ elif "balance" in said.lower() or "balance inquiry" in said.lower():
     checkBalance()
 
 
+# ... (previous code)
+
 # Code for changing PIN.
 elif "change pin" in said.lower() or "change my pin" in said.lower():
     speak("You have chosen to change your PIN.")
@@ -333,7 +335,6 @@ elif "change pin" in said.lower() or "change my pin" in said.lower():
                                         f = 0
                                         speak("Your new pin has been set successfully!")
                                         print("Your new pin has been set successfully!")
-                                        speak(regards)
                             file = open("Files/Accounts.csv", 'w', newline='')
                             writer = csv.writer(file, delimiter=',')
                             for i in range(len(l)):
@@ -349,11 +350,9 @@ elif "change pin" in said.lower() or "change my pin" in said.lower():
                                 exit()
                             print("The entered pin does not match, please try again.")
 
-    speak("Your new pin has been set successfully!")
-    print("Your new pin has been set successfully!")
     speak(regards)
-
     exit()
+
 
 else:
     speak("Sorry! The command you entered does not exist, you will be taken back to the main menu.")
