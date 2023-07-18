@@ -74,15 +74,16 @@ def intro():
 
 
 def checkBalance():
+    global pin, accountNumber  # Make pin and accountNumber global variables
     print("Checking balance, please hold on...")
     with open("Files/Accounts.csv", 'r') as file:
         reader = csv.reader(file, delimiter=',')
         for i in reader:
-            if i[1] == pin and i[3] == accountNumber:
+            if int(i[1]) == pin and int(i[3]) == accountNumber:
                 balance = i[2]
                 speak(f"Your balance is: {balance}")
                 print(f"Your balance is: {balance}")
-                break  # Exit the loop once the balance is found
+                break
         else:
             speak("Balance not found for the user.")
             print("Balance not found for the user.")
@@ -103,25 +104,25 @@ while flag1:
         t = 1
         reader = csv.reader(file, delimiter=',')
         l = []
-        l1 = []
-        l2 = []
         for i in reader:
             l.append(i)
-        for i in l:
-            i[1] = int(i[1])
-            i[2] = float(i[2])
-            l1.append(i[1])
-            l2.append(int(i[3]))
 
         print("{*{Few example accounts loaded, please select one from below}*}")
         print(l)
         tries = 0
 
     while True:
-        accountNumber = int(input("Enter your 10-digit account number: "))
+        accountNumberInput = input("Enter your 10-digit account number: ").strip()
+
+        if not accountNumberInput or not accountNumberInput.isdigit():
+            speak("Please enter a valid 10-digit account number.")
+            print("Please enter a valid 10-digit account number.")
+            continue
+
+        accountNumber = int(accountNumberInput)
 
         for i in l:
-            if i[3] == accountNumber:
+            if i[3] == str(accountNumber):  # Compare accountNumber as string from CSV
                 tries = tries + 1
                 break
 
@@ -133,7 +134,6 @@ while flag1:
                 print("You have exceeded the maximum number of trials, please try again later.")
                 speak("You have exceeded the maximum number of trials, please try again later.")
                 exit()
-
         else:
             user = i[0]
             print("Account number exists.")
@@ -141,22 +141,21 @@ while flag1:
 
     if len(str(accountNumber)) == 10:
         flag1 = 0
-        speak("Please enter your 4-digit PIN number.")
-        print("Please enter your 4-digit PIN number.")
+        speak("Please say your 4-digit PIN number.")
+        print("Please say your 4-digit PIN number.")
         while flag2 < 3 and flag1 == 0:
             try:
-                pin = int(input())
-
+                pin = int(inputCommand().replace(" ", ""))  # Use voice input for PIN
             except Exception as error:
-                print("Error: " + error)
+                print("Error: " + str(error))
                 speak("Error")
 
-            if len(str(pin)) == 4 and pin in l1:
-                if l1.index(pin) == l2.index(accountNumber):
+            if len(str(pin)) == 4 and pin in [int(acc[1]) for acc in l]:  # Compare pin directly
+                if [int(acc[1]) for acc in l].index(pin) == [int(acc[3]) for acc in l].index(accountNumber):
                     print("Accepted!")
                     speak("Accepted!")
-                    flag1 = 0  # Set flag1 to 0 to continue the program execution
-                    break  # Exit the while loop and proceed with the program
+                    flag1 = 0
+                    break
                 else:
                     print("Incorrect PIN. Please try again.")
                     speak("Incorrect PIN. Please try again.")
@@ -165,8 +164,6 @@ while flag1:
                 if flag2 == 3:
                     speak("You have exceeded your maximum number of trials.")
                     exit()
-
-
     else:
         speak("Please enter a valid 10-digit account number.")
         print("Please enter a valid 10-digit account number.")
