@@ -13,8 +13,8 @@ attempts = 0
 limit = 10000
 minimumLimit = 100
 
-success = "Your transaction has been successfully done."
-regards = "Thank you for patronage, we hope to see you again!"
+success = "Your transaction has been done successfully..."
+regards = "Thank you for patronage and for using this ATM system, we hope to see you again, goodbye!"
 
 
 class Err(Exception):
@@ -324,7 +324,6 @@ def main():
             main()
         elif "exit" in continue_exit:
             speak(regards)
-            print("Thank you for using the ATM system. Goodbye!")
             exit()
 
 
