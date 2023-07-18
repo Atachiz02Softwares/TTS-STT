@@ -1,11 +1,8 @@
-import pyttsx4
-import random
-from gtts import gTTS
-import speech_recognition as sr
-import os
 import csv
-
 import datetime
+
+import pyttsx4
+import speech_recognition as sr
 
 # Final global variables
 attempts = 0
@@ -79,11 +76,11 @@ def checkBalance():
     with open("Files/Accounts.csv", 'r') as file:
         reader = csv.reader(file, delimiter=',')
         for i in reader:
-            if int(i[1]) == pin and int(i[3]) == accountNumber:
+            if int(i[1]) == pin and int(i[3]) == accountNumber:  # Cast accountNumber to int during comparison
                 balance = i[2]
                 speak(f"Your balance is: {balance}")
                 print(f"Your balance is: {balance}")
-                break
+                break  # Exit the loop once the balance is found
         else:
             speak("Balance not found for the user.")
             print("Balance not found for the user.")
