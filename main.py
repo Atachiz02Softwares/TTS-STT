@@ -1,8 +1,11 @@
-import csv
-import datetime
-
 import pyttsx4
+import random
+from gtts import gTTS
 import speech_recognition as sr
+import os
+import csv
+
+import datetime
 
 # Final global variables
 attempts = 0
@@ -42,7 +45,6 @@ def inputCommand():
 
 
 # Greets user according to time of the day.
-
 def wish():
     hour = datetime.datetime.now().hour
 
@@ -70,45 +72,162 @@ def intro():
     print("\t\t\t\t\tPowered by: Morpheus Softwares")
 
 
-def checkBalance():
-    global pin, accountNumber  # Make pin and accountNumber global variables
+def read_accounts_data():
+    with open("Files/Accounts.csv", 'r', newline='') as file:
+        reader = csv.DictReader(file)
+        accounts_data = list(reader)
+    return accounts_data
+
+
+def write_accounts_data(accounts_data):
+    with open("Files/Accounts.csv", 'w', newline='') as file:
+        fieldnames = ["name", "pin", "balance", "accountNumber"]
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(accounts_data)
+
+
+def checkBalance(accounts_data, pin, accountNumber):
     print("Checking balance, please hold on...")
-    with open("Files/Accounts.csv", 'r') as file:
-        reader = csv.reader(file, delimiter=',')
-        for i in reader:
-            if int(i[1]) == pin and int(i[3]) == accountNumber:  # Cast accountNumber to int during comparison
-                balance = i[2]
-                speak(f"Your balance is: {balance}")
-                print(f"Your balance is: {balance}")
-                break  # Exit the loop once the balance is found
-        else:
-            speak("Balance not found for the user.")
-            print("Balance not found for the user.")
+    for row in accounts_data:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+            balance = float(row["balance"])
+            speak(f"Your balance is: {balance}")
+            print(f"Your balance is: {balance}")
+            break
+    else:
+        speak("Balance not found for the user.")
+        print("Balance not found for the user.")
 
 
-intro()
+def withdrawCash(accounts_data, pin, accountNumber):
+    speak("You have chosen to withdraw cash.")
+    for row in accounts_data:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+            available_balance = float(row["balance"])
+            while True:
+                speak("Say or enter the amount you want to withdraw.")
+                print("Say or enter the amount you want to withdraw:")
+                amount = inputCommand()
+                try:
+                    amount = int(amount)
+                    if amount <= available_balance:
+                        row["balance"] = str(available_balance - amount)
+                        write_accounts_data(accounts_data)
+                        print(f"Withdrawal successful. Your new balance is {row['balance']}")
+                        speak(f"Withdrawal successful. Your new balance is {row['balance']}")
+                        break
+                    else:
+                        speak("The amount you want to withdraw exceeds your account balance.")
+                        print("The amount you want to withdraw exceeds your account balance.")
+                except ValueError:
+                    speak("Please enter a valid amount.")
+                    print("Please enter a valid amount.")
+            break
+    else:
+        speak("Account not found.")
+        print("Account not found.")
 
-wish()
 
-user = ""
+def depositCash(accounts_data, pin, accountNumber):
+    speak("You have chosen to deposit cash.")
+    for row in accounts_data:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+            while True:
+                speak("Say or enter the amount you want to deposit.")
+                print("Say or enter the amount you want to deposit:")
+                amount = inputCommand()
+                try:
+                    amount = int(amount)
+                    if amount <= 20000:
+                        row["balance"] = str(float(row["balance"]) + amount)
+                        write_accounts_data(accounts_data)
+                        print(f"Deposit successful. Your new balance is {row['balance']}")
+                        speak(f"Deposit successful. Your new balance is {row['balance']}")
+                        break
+                    else:
+                        speak("The amount you want to deposit exceeds the limit.")
+                        print("The amount you want to deposit exceeds the limit.")
+                except ValueError:
+                    speak("Please enter a valid amount.")
+                    print("Please enter a valid amount.")
+            break
+    else:
+        speak("Account not found.")
+        print("Account not found.")
 
-# Inputting and verifying pin and account number
-speak("Please enter your 10-digit account number.")
-flag1 = 1
-flag2 = 0
-while flag1:
-    with open("Files/Accounts.csv", 'r') as file:
-        t = 1
-        reader = csv.reader(file, delimiter=',')
-        l = []
-        for i in reader:
-            l.append(i)
 
-        print("{*{Few example accounts loaded, please select one from below}*}")
-        print(l)
-        tries = 0
+def changePin(accounts_data, pin, accountNumber):
+    speak("You have chosen to change your PIN.")
+    tries = 0
+    for row in accounts_data:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+            while tries < 3:
+                speak("Please enter your old 4-digit PIN.")
+                print("Please enter your old 4-digit PIN:")
+                oldPin = inputCommand()
+                try:
+                    oldPin = int(oldPin)
+                    if oldPin == pin:
+                        while True:
+                            speak("Enter your new 4-digit PIN.")
+                            print("Enter your new 4-digit PIN:")
+                            newPin1 = inputCommand()
+                            try:
+                                newPin1 = int(newPin1)
+                                if len(str(newPin1)) == 4:
+                                    speak("Please re-enter your new 4-digit PIN to confirm.")
+                                    print("Please re-enter your new 4-digit PIN to confirm:")
+                                    newPin2 = inputCommand()
+                                    try:
+                                        newPin2 = int(newPin2)
+                                        if len(str(newPin2)) == 4 and newPin1 == newPin2:
+                                            row["pin"] = str(newPin1)
+                                            write_accounts_data(accounts_data)
+                                            print("Your new PIN has been set successfully!")
+                                            speak("Your new PIN has been set successfully!")
+                                            break
+                                        else:
+                                            speak("The PINs you entered do not match. Please try again.")
+                                            print("The PINs you entered do not match. Please try again.")
+                                            tries += 1
+                                    except ValueError:
+                                        speak("Please enter a valid 4-digit PIN.")
+                                        print("Please enter a valid 4-digit PIN.")
+                                else:
+                                    speak("Please enter a valid 4-digit PIN.")
+                                    print("Please enter a valid 4-digit PIN.")
+                            except ValueError:
+                                speak("Please enter a valid 4-digit PIN.")
+                                print("Please enter a valid 4-digit PIN.")
+                    else:
+                        speak("Your old PIN does not match. Please try again.")
+                        print("Your old PIN does not match. Please try again.")
+                        tries += 1
+                        if tries == 3:
+                            speak("You have exceeded the maximum number of trials.")
+                            print("You have exceeded the maximum number of trials.")
+                            exit()
+                except ValueError:
+                    speak("Please enter a valid 4-digit PIN.")
+                    print("Please enter a valid 4-digit PIN.")
+                break
+    else:
+        speak("Account not found.")
+        print("Account not found.")
 
+
+def main():
+    intro()
+    wish()
+
+    # Inputting and verifying pin and account number
     while True:
+        accounts_data = read_accounts_data()
+
+        print("Few example accounts loaded, please select one from below:")
+        print(accounts_data)
+        speak("Enter your 10-digit account number.")
         accountNumberInput = input("Enter your 10-digit account number: ").strip()
 
         if not accountNumberInput or not accountNumberInput.isdigit():
@@ -117,242 +236,97 @@ while flag1:
             continue
 
         accountNumber = int(accountNumberInput)
+        attempts = 0
 
-        for i in l:
-            if i[3] == str(accountNumber):  # Compare accountNumber as string from CSV
-                tries = tries + 1
+        user = None
+        for row in accounts_data:
+            if int(row["accountNumber"]) == accountNumber:
+                user = row["name"]
+                pin = int(row["pin"])
                 break
 
-        if tries == 0:
+        if user is None:
             print("Invalid account number, the account number does not exist.")
             speak("The account number is invalid.")
-            attempts = attempts + 1
+            attempts += 1
             if attempts == 3:
                 print("You have exceeded the maximum number of trials, please try again later.")
                 speak("You have exceeded the maximum number of trials, please try again later.")
                 exit()
         else:
-            user = i[0]
             print("Account number exists.")
             break
 
     if len(str(accountNumber)) == 10:
-        flag1 = 0
-        speak("Please say your 4-digit PIN number.")
-        print("Please say your 4-digit PIN number.")
-        while flag2 < 3 and flag1 == 0:
+        speak("Please enter your 4-digit PIN number.")
+        print("Please enter your 4-digit PIN number.")
+        while True:
             try:
-                pin = int(inputCommand().replace(" ", ""))  # Use voice input for PIN
-            except Exception as error:
-                print("Error: " + str(error))
-                speak("Error")
-
-            if len(str(pin)) == 4 and pin in [int(acc[1]) for acc in l]:  # Compare pin directly
-                if [int(acc[1]) for acc in l].index(pin) == [int(acc[3]) for acc in l].index(accountNumber):
-                    print("Accepted!")
-                    speak("Accepted!")
-                    flag1 = 0
-                    break
+                pin_input = inputCommand()
+                pin = int(pin_input)
+                if len(str(pin)) == 4:
+                    if pin == pin:
+                        print("Accepted!")
+                        speak("Accepted!")
+                        break
+                    else:
+                        print("Incorrect PIN. Please try again.")
+                        speak("Incorrect PIN. Please try again.")
                 else:
-                    print("Incorrect PIN. Please try again.")
-                    speak("Incorrect PIN. Please try again.")
-                    flag2 += 1
+                    speak("Please enter a valid 4-digit PIN.")
+                    print("Please enter a valid 4-digit PIN.")
+            except ValueError:
+                speak("Please enter a valid 4-digit PIN.")
+                print("Please enter a valid 4-digit PIN.")
 
-                if flag2 == 3:
-                    speak("You have exceeded your maximum number of trials.")
-                    exit()
     else:
         speak("Please enter a valid 10-digit account number.")
         print("Please enter a valid 10-digit account number.")
-
-wish()
-speak("Hello and Welcome!")
-# speak(user)
-
-print(
-    "..........................................................CHOOSE FROM OPTIONS BELOW")
-print("")
-
-speak("Please select from the options below.")
-print(
-    "\t\t\t\t\t(1) CASH WITHDRAWAL                                (2) CASH DEPOSIT"
-    "              ")
-speak("1. Cash Withdrawal. 2. Cash Deposit")
-print(
-    "\t\t\t\t\t(3) BALANCE INQUIRY                                (4) CHANGE PIN"
-    "              ")
-speak("3. Balance Inquiry. 4. Change Pin")
-print(
-    ".................................................................................................................."
-    ".....................")
-
-said = inputCommand()
-
-# Code for withdrawing money.
-if "withdraw" in said.lower() or "cash withdrawal" in said.lower():
-    speak("You have chosen to withdraw cash.")
-    # print("Enter denomination.")
-    speak("Say or enter the amount you want to withdraw.")
-
-    with open("Files/Accounts.csv", 'r') as file:
-        t = 1
-        reader = csv.reader(file, delimiter=',')
-        l = []
-        for i in reader:
-            l.append(i)
-        for i in l:
-            i[1] = int(i[1])
-            i[2] = float(i[2])
-
-    trials = 0
-    for i in l:
-        if i[1] == pin:
-            print(i[2])
-            while True:
-                amount = int(input())
-                if amount > i[2]:
-                    speak("The amount you wish to withdraw exceeds the amount you have in your account.")
-                    speak("Please say or enter a valid amount.")
-                    trials = trials + 1
-                    if trials == 3:
-                        speak("You have exceeded the number of trials.")
-                        print("You have exceeded the number of trials.")
-                        exit()
-                elif amount < i[2]:
-                    break
-
-            i[2] -= amount
-            print(i[2])
-            t = 0
-    print(l)
-
-    file = open("Files/Accounts.csv", 'w', newline='')
-    writer = csv.writer(file, delimiter=',')
-    for i in range(len(l)):
-        writer.writerow(l[i])
-    file.close()
-    speak(success + " Would you like to know your balance?")
-    reply = inputCommand()
-
-    if "Yes" in reply.lower() or "Yes please" in reply.lower() or "Yeah" in reply.lower() \
-            or "Yes I would like to know my balance" in reply.lower():
-        checkBalance()
-    else:
-        file.close()
-        speak(regards)
         exit()
 
-# Code for depositing cash.
-elif "deposit" in said.lower() or "cash deposit" in said.lower():
-    speak("You have chosen to deposit cash.")
-    deposit = int(input("Enter the amount to deposit: "))
+    speak("Hello and Welcome!")
 
-    with open("Files/Accounts.csv", 'r') as file:
-        t = 1
-        reader = csv.reader(file, delimiter=',')
-        l = []
-        for i in reader:
-            l.append(i)
-        for i in l:
-            i[1] = int(i[1])
-            i[2] = float(i[2])
+    while True:
+        print("..........................................................CHOOSE FROM OPTIONS BELOW")
+        print("")
+        speak("Please select from the options below.")
+        print(
+            "\t\t\t\t\t(1) CASH WITHDRAWAL                                (2) CASH DEPOSIT"
+            "              ")
+        speak("1. Cash Withdrawal. 2. Cash Deposit")
+        print(
+            "\t\t\t\t\t(3) BALANCE INQUIRY                                (4) CHANGE PIN"
+            "              ")
+        speak("3. Balance Inquiry. 4. Change Pin")
+        print(
+            ".................................................................................................................."
+            ".....................")
 
-        for i in l:
-            if i[1] == pin:
-                while True:
-                    if deposit > 20000:
-                        print("Please enter a valid amount to be deposited.")
-                        speak("The amount you wish to deposit exceeds the limit, please enter a valid amount.")
-                        deposit = int(input())
-                    else:
-                        break
-                i[2] += deposit
-                t = 0
+        option = inputCommand()
 
-    # Update the new appended balance in CSV file
-    file = open("Files/Accounts.csv", 'w', newline='')
-    writer = csv.writer(file, delimiter=',')
-    for i in range(len(l)):
-        writer.writerow(l[i])
-    file.close()
-
-    speak(success + " Would you like to know your balance?")
-    check = inputCommand()
-    if "No" in check.lower() or "No thank you" in check.lower():
-        speak(regards)
-        exit()
-    else:
-        checkBalance()
-        speak(regards)
-        exit()
-
-
-# Code for checking balance.
-elif "balance" in said.lower() or "balance inquiry" in said.lower():
-    speak("You have selected to check your balance.")
-    checkBalance()
-
-
-# ... (previous code)
-
-# Code for changing PIN.
-elif "change pin" in said.lower() or "change my pin" in said.lower():
-    speak("You have chosen to change your PIN.")
-    print("Please enter your old pin: ")
-    tries = 0
-    f = 1
-    while f == 1:
-        oldPin = int(input())
-        if oldPin != pin:
-            speak("Your pin does not match, please enter your old pin again.")
-            print("Your pin does not match, please enter your old pin again:")
-            tries = tries + 1
-            if tries == 3:
-                speak("You have exceeded the maximum number of trials.")
-                exit()
+        if "withdraw" in option.lower() or "cash withdrawal" in option.lower():
+            withdrawCash(accounts_data, pin, accountNumber)
+        elif "deposit" in option.lower() or "cash deposit" in option.lower():
+            depositCash(accounts_data, pin, accountNumber)
+        elif "balance" in option.lower() or "balance inquiry" in option.lower():
+            checkBalance(accounts_data, pin, accountNumber)
+        elif "change pin" in option.lower() or "change my pin" in option.lower():
+            changePin(accounts_data, pin, accountNumber)
         else:
-            pinTrials = 0
-            while f == 1:
-                speak("Enter your new pin.")
-                print("Enter your new pin:")
-                newPin1 = int(input())
-                if len(str(newPin1)) == 4:
-                    speak("Please re-enter your new pin to confirm.")
-                    print("Please re-enter your new pin to confirm:")
-                    newPin2 = int(input())
-                    if len(str(newPin2)) == 4:
-                        if newPin1 == newPin2:
-                            with open("Files/Accounts.csv", 'r') as file:
-                                reader = csv.reader(file, delimiter=',')
-                                l = []
-                                for i in reader:
-                                    l.append(i)
-                                for i in l:
-                                    i[1] = int(i[1])
-                                    i[2] = float(i[2])
-                                    if i[1] == oldPin and i[3] == accountNumber:
-                                        i[1] = newPin1
-                                        f = 0
-                                        speak("Your new pin has been set successfully!")
-                                        print("Your new pin has been set successfully!")
-                            file = open("Files/Accounts.csv", 'w', newline='')
-                            writer = csv.writer(file, delimiter=',')
-                            for i in range(len(l)):
-                                writer.writerow(l[i])
-                            file.close()
-                            exit()
-                        else:
-                            speak("The pin does not match, please try again.")
-                            pinTrials = pinTrials + 1
-                            if pinTrials == 3:
-                                speak("You have exceeded the maximum number of trials.")
-                                print("You have exceeded the maximum number of trials.")
-                                exit()
-                            print("The entered pin does not match, please try again.")
+            speak("Sorry! The command you entered does not exist, please try again.")
+            print("Sorry! The command you entered does not exist, please try again.")
 
-    speak(regards)
-    exit()
+        # Ask if the user wants to continue or exit
+        speak("Would you like to continue or exit?")
+        print("Would you like to continue or exit? (Say 'Continue' or 'Exit')")
+        continue_exit = inputCommand().lower()
+        if "continue" in continue_exit:
+            main()
+        elif "exit" in continue_exit:
+            speak(regards)
+            print("Thank you for using the ATM system. Goodbye!")
+            exit()
 
 
-else:
-    speak("Sorry! The command you entered does not exist, you will be taken back to the main menu.")
+if __name__ == "__main__":
+    main()
