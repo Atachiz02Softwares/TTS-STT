@@ -104,7 +104,7 @@ while flag1:
 
     while True:
         accountNumber = input("Enter your 10-digit account number:")
-        pin = "0000"
+        # pin = "0000"
 
         for i in l:
             if i[3] == accountNumber:
@@ -298,19 +298,25 @@ elif "deposit" in said.lower() or "cash deposit" in said.lower():
         speak(regards)
         exit()
 
-    # Code for checking balance.
+
+# Code for checking balance.
 elif "balance" in said.lower() or "balance inquiry" in said.lower():
     speak("You have selected to check your balance.")
+    print("Checking balance...")
+    print(f"User PIN: {pin}")
+    print(f"Account Number: {accountNumber}")
     with open("Files/Accounts.csv", 'r') as file:
         reader = csv.reader(file, delimiter=',')
-        a = []
         for i in reader:
-            a.append(i)
-
-        for i in a:
             if i[1] == int(pin) and i[3] == accountNumber:
-                speak(f"Your balance is: {i[2]}")
-                print(f"Your balance is: {i[2]}")
+                balance = i[2]
+                print(f"Balance found: {balance}")
+                speak(f"Your balance is: {balance}")
+                print(f"Your balance is: {balance}")
+                break  # Exit the loop once the balance is found
+        else:
+            print("Balance not found for the user.")
+
 
 # Code for changing PIN.
 elif "change pin" in said.lower() or "change my pin" in said.lower():
