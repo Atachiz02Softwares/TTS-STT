@@ -1,54 +1,74 @@
+import csv
+import datetime
+import pyttsx3
+import speech_recognition as sr
 import tkinter as tk
+from tkinter import messagebox
 
+from main import intro, wish, main
 
-def deposit():
-    # Add code to handle deposit functionality here
-    print("Deposit")
+# ... (existing code up to main)
 
-
-def withdraw():
-    # Add code to handle withdrawal functionality here
-    print("Withdraw")
-
-
-def balance():
-    # Add code to handle balance checking functionality here
-    print("Balance")
-
-
-def transfer():
-    # Add code to handle transfer functionality here
-    print("Transfer")
-
-
-def exit_app():
-    # Add code to handle exit functionality here
-    print("Exit")
-
-
-# Create the main window
+# Create a tkinter window
 window = tk.Tk()
-window.title("ATM")
+window.title("ATM System for the Visually Impaired")
+window.geometry("400x300")
 
-# Create a frame for buttons
-button_frame = tk.Frame(window)
-button_frame.pack(pady=20)
+# Create a label for displaying messages
+message_label = tk.Label(window, text="", wraplength=300)
+message_label.pack()
 
-# Create the buttons with different colors
-deposit_btn = tk.Button(button_frame, text="Deposit", width=15, command=deposit, bg="green", fg="white")
-deposit_btn.pack(side=tk.LEFT, padx=10)
 
-withdraw_btn = tk.Button(button_frame, text="Withdraw", width=15, command=withdraw, bg="blue", fg="white")
-withdraw_btn.pack(side=tk.LEFT, padx=10)
+# Create a function to update the message label
+def update_message(message):
+    message_label.config(text=message)
 
-balance_btn = tk.Button(button_frame, text="Balance", width=15, command=balance, bg="orange", fg="white")
-balance_btn.pack(side=tk.LEFT, padx=10)
 
-transfer_btn = tk.Button(button_frame, text="Transfer", width=15, command=transfer, bg="purple", fg="white")
-transfer_btn.pack(side=tk.LEFT, padx=10)
+# Create a function to get user input using tkinter Entry widget
+user_input = tk.Entry(window)
+user_input.pack()
 
-exit_btn = tk.Button(window, text="Exit", width=15, command=exit_app, bg="red", fg="white")
-exit_btn.pack(pady=10)
 
-# Start the main event loop
+def get_user_input():
+    return user_input.get()
+
+
+# ... (other existing functions)
+
+# Modify the inputCommand function to use tkinter
+def inputCommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        update_message("Listening...")
+        window.update()
+        audio = r.listen(source)
+
+    try:
+        update_message("Recognizing...")
+        window.update()
+        said = r.recognize_google(audio, language="en-in")
+        update_message(f"You said: {said}")
+        window.update()
+    except Exception as e:
+        print(e)
+        update_message("Can you please say that again...")
+        window.update()
+        said = "Sorry, I did not understand that!"
+    return said
+
+
+# Modify the main function to display messages and get user inputs in the GUI
+def entry():
+    intro()
+    wish()
+    main()
+
+    # ... (rest of your existing code)
+
+
+# Add a button to start the ATM system
+start_button = tk.Button(window, text="Start ATM System", command=entry)
+start_button.pack()
+
+# Run the tkinter main loop
 window.mainloop()

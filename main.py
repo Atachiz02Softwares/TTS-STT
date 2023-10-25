@@ -1,11 +1,8 @@
-import pyttsx4
-import random
-from gtts import gTTS
-import speech_recognition as sr
-import os
 import csv
-
 import datetime
+
+import pyttsx4
+import speech_recognition as sr
 
 # Final global variables
 attempts = 0
