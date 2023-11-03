@@ -69,15 +69,15 @@ def intro():
     print("\t\t\t\t\tPowered by: Morpheus Softwares")
 
 
-def read_accounts_data():
-    with open("Files/Accounts.csv", 'r', newline='') as file:
+def read_accounts_data(file_name):
+    with open(file_name, 'r', newline='') as file:
         reader = csv.DictReader(file)
         accounts_data = list(reader)
     return accounts_data
 
 
-def write_accounts_data(accounts_data):
-    with open("Files/Accounts.csv", 'w', newline='') as file:
+def write_accounts_data(file_name, accounts_data):
+    with open(file_name, 'w', newline='') as file:
         fieldnames = ["name", "pin", "balance", "accountNumber"]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
@@ -110,7 +110,7 @@ def withdrawCash(accounts_data, pin, accountNumber):
                     amount = int(amount)
                     if amount <= available_balance:
                         row["balance"] = str(available_balance - amount)
-                        write_accounts_data(accounts_data)
+                        write_accounts_data("Files/Accounts.csv", accounts_data)
                         print(f"Withdrawal successful. Your new balance is {row['balance']}")
                         speak(f"Withdrawal successful. Your new balance is {row['balance']}")
                         break
@@ -138,7 +138,7 @@ def depositCash(accounts_data, pin, accountNumber):
                     amount = int(amount)
                     if amount <= 20000:
                         row["balance"] = str(float(row["balance"]) + amount)
-                        write_accounts_data(accounts_data)
+                        write_accounts_data("Files/Accounts.csv", accounts_data)
                         print(f"Deposit successful. Your new balance is {row['balance']}")
                         speak(f"Deposit successful. Your new balance is {row['balance']}")
                         break
@@ -180,7 +180,7 @@ def changePin(accounts_data, pin, accountNumber):
                                         newPin2 = int(newPin2)
                                         if len(str(newPin2)) == 4 and newPin1 == newPin2:
                                             row["pin"] = str(newPin1)
-                                            write_accounts_data(accounts_data)
+                                            write_accounts_data("Files/Accounts.csv", accounts_data)
                                             print("Your new PIN has been set successfully!")
                                             speak("Your new PIN has been set successfully!")
                                             break
@@ -220,7 +220,7 @@ def main():
 
     # Inputting and verifying pin and account number
     while True:
-        accounts_data = read_accounts_data()
+        accounts_data = read_accounts_data("Files/Accounts.csv")
 
         print("Few example accounts loaded, please select one from below:")
         print(accounts_data)
