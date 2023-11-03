@@ -67,7 +67,7 @@ def withdraw():
                 messagebox.showerror("Error", "Account not found.")
 
 
-# def deposit():
+def deposit():
 
 
 # Function to open the main application
