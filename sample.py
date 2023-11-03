@@ -1,6 +1,6 @@
 import csv
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 from tkinter.scrolledtext import ScrolledText
 
 from main import write_accounts_data, read_accounts_data
@@ -40,26 +40,31 @@ def login():
             messagebox.showerror("Login Failed", "Invalid account number or PIN")
 
 
-# def withdraw():
-#     accounts_data = read_accounts_data("Files/Accounts.csv")
-#     for row in accounts_data:
-#         if int(row["pin"]) == pin and int(row["accountNumber"]) == account_number:
-#             available_balance = float(row["balance"])
-#             while True:
-#                 try:
-#                     amount = int(amount)
-#                     if amount <= available_balance:
-#                         row["balance"] = str(available_balance - amount)
-#                         write_accounts_data("Files/Accounts.csv", accounts_data)
-#                         messagebox.showinfo("Success", f"Withdrawal successful. Your new balance is {row['balance']}")
-#                         break
-#                     else:
-#                         messagebox.showerror("Error", "The amount you want to withdraw exceeds your account balance.")
-#                 except ValueError:
-#                     messagebox.showerror("Error", "Please enter a valid amount.")
-#             break
-#     else:
-#         messagebox.showerror("Error", "Account not found.")
+def withdraw():
+    accounts_data = read_accounts_data("Files/Accounts.csv")
+    current_accounts_data = read_accounts_data("Files/CurrentlySignedInUser.csv")
+
+    for r in current_accounts_data:
+        for row in accounts_data:
+            if int(r["pin"]) == int(row["pin"]) and int(r["accountNumber"]) == int(row["accountNumber"]):
+                available_balance = float(row["balance"])
+                while True:
+                    try:
+                        amount = int(simpledialog.askstring("Input", "Enter amount to withdraw:"))
+                        if amount and amount <= available_balance:
+                            row["balance"] = str(available_balance - amount)
+                            write_accounts_data("Files/Accounts.csv", accounts_data)
+                            messagebox.showinfo("Success",
+                                                f"Withdrawal successful. Your new balance is {row['balance']}")
+                            break
+                        else:
+                            messagebox.showerror("Error",
+                                                 "The amount you want to withdraw exceeds your account balance.")
+                    except ValueError:
+                        messagebox.showerror("Error", "Please enter a valid amount.")
+                break
+            else:
+                messagebox.showerror("Error", "Account not found.")
 
 
 # def deposit():
@@ -76,7 +81,8 @@ def open_main_application():
     displayScreen.grid(row=2, column=1, padx=10, pady=10, columnspan=3)
     displayScreen.insert(tk.INSERT, welcome)
 
-    cashWithdrawal = tk.Button(win, text="Cash Withdrawal", width=12, background="green", foreground="white")
+    cashWithdrawal = tk.Button(win, text="Cash Withdrawal", width=12, background="green", foreground="white",
+                               command=withdraw)
     cashWithdrawal.grid(row=5, column=1, padx=5, pady=5)
 
     cashDeposit = tk.Button(win, text="Cash Deposit", width=12, background="brown", foreground="white")
@@ -85,8 +91,8 @@ def open_main_application():
     inputLabel = tk.Label(win, text="Input amount for withdrawal or deposit:", padx=5, pady=5)
     inputLabel.grid(row=5, column=2)
 
-    searchValue = tk.StringVar()
-    amount = tk.Entry(win, textvariable=searchValue, width=50)
+    value = tk.StringVar()
+    amount = tk.Entry(win, textvariable=value, width=50)
     amount.grid(row=6, column=2)
 
     cashTransfer = tk.Button(win, text="Cash Transfer", width=12, background="blue", foreground="white")
