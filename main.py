@@ -92,9 +92,10 @@ def checkBalance(accounts_data, pin, accountNumber):
             speak(f"Your balance is: {balance}")
             print(f"Your balance is: {balance}")
             break
-    else:
-        speak("Balance not found for the user.")
-        print("Balance not found for the user.")
+        else:
+            speak("Balance not found for the customer.")
+            print("Balance not found for the customer.")
+            break
 
 
 def withdrawCash(accounts_data, pin, accountNumber):
@@ -124,6 +125,7 @@ def withdrawCash(accounts_data, pin, accountNumber):
         else:
             speak("Account not found.")
             print("Account not found.")
+            break
 
 
 def depositCash(accounts_data, pin, accountNumber):
@@ -149,9 +151,10 @@ def depositCash(accounts_data, pin, accountNumber):
                     speak("Please enter a valid amount.")
                     print("Please enter a valid amount.")
             break
-    else:
-        speak("Account not found.")
-        print("Account not found.")
+        else:
+            speak("Account not found.")
+            print("Account not found.")
+            break
 
 
 def changePin(accounts_data, pin, accountNumber):
@@ -209,9 +212,10 @@ def changePin(accounts_data, pin, accountNumber):
                     speak("Please enter a valid 4-digit PIN.")
                     print("Please enter a valid 4-digit PIN.")
                 break
-    else:
-        speak("Account not found.")
-        print("Account not found.")
+        else:
+            speak("Account not found.")
+            print("Account not found.")
+            break
 
 
 def main():
