@@ -3,12 +3,16 @@ import datetime
 
 import pyttsx4
 import speech_recognition as sr
+import winsound
+
+frequency = 1000  # Set frequency in Hz
+duration = 500  # Set duration in milliseconds
 
 # Final global variables
 attempts = 0
 
 limit = 10000
-minimum_limit = 100
+minimum_limit = 500
 
 success = "Your transaction has been done successfully..."
 regards = "Thank you for patronage and for using this ATM system, we hope to see you again, goodbye!"
@@ -30,6 +34,8 @@ def inputCommand():
         Returns:
             str: The recognized input.
     """
+    winsound.Beep(frequency, duration)  # Play a beep sound for half a second
+
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -37,7 +43,7 @@ def inputCommand():
 
     try:
         print("Recognizing...")
-        said = r.recognize_google(audio, language="en-in")
+        said = r.recognize_google(audio, language="en-ng")
         print(f"You said...: {said}\n")
 
     except Exception as e:
@@ -47,7 +53,6 @@ def inputCommand():
     return said
 
 
-# Greets user according to time of the day.
 def wish():
     """
         Greets the user based on the time of the day.
