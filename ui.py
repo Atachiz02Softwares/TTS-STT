@@ -170,8 +170,7 @@ def open_main_application():
                                command=withdraw)
     cashWithdrawal.grid(row=5, column=1, padx=5, pady=5)
 
-    cashDeposit = tk.Button(win, text="Cash Deposit", width=12, background="brown", foreground="white",
-                            command=deposit)
+    cashDeposit = tk.Button(win, text="Cash Deposit", width=12, background="brown", foreground="white", command=deposit)
     cashDeposit.grid(row=5, column=3, padx=5, pady=5)
 
     inputLabel = tk.Label(win, text="Input amount for withdrawal or deposit:", padx=5, pady=5)

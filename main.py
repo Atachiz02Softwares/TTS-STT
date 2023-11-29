@@ -8,7 +8,7 @@ import speech_recognition as sr
 attempts = 0
 
 limit = 10000
-minimumLimit = 100
+minimum_limit = 100
 
 success = "Your transaction has been done successfully..."
 regards = "Thank you for patronage and for using this ATM system, we hope to see you again, goodbye!"
@@ -24,6 +24,12 @@ engine.setProperty("voice", voices[0].id)
 
 
 def inputCommand():
+    """
+        Recognizes and returns user input through speech or text.
+
+        Returns:
+            str: The recognized input.
+    """
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -43,6 +49,9 @@ def inputCommand():
 
 # Greets user according to time of the day.
 def wish():
+    """
+        Greets the user based on the time of the day.
+    """
     hour = datetime.datetime.now().hour
 
     if 0 <= hour <= 12:
@@ -56,11 +65,20 @@ def wish():
 
 
 def speak(text):
+    """
+        Uses text-to-speech to speak the provided text.
+
+        Args:
+            text (str): The text to be spoken.
+    """
     engine.say(text)
     engine.runAndWait()
 
 
 def intro():
+    """
+        Displays the introduction to the ATM system.
+    """
     print("\t\t\t\t************************************")
     print("\t\t\t\t------------------------------------")
     print("\t\t\t\tATM SYSTEM FOR THE VISUALLY IMPAIRED")
@@ -70,6 +88,15 @@ def intro():
 
 
 def read_accounts_data(file_name):
+    """
+        Reads and retrieves account data from a CSV file.
+
+        Args:
+            file_name (str): The name of the CSV file.
+
+        Returns:
+            list: A list of dictionaries containing account information.
+    """
     with open(file_name, 'r', newline='') as file:
         reader = csv.DictReader(file)
         accounts_data = list(reader)
@@ -77,6 +104,16 @@ def read_accounts_data(file_name):
 
 
 def write_accounts_data(file_name, accounts_data):
+    """
+        Writes account data to a CSV file.
+
+        Args:
+            file_name (str): The name of the CSV file to write to.
+            accounts_data (list): A list of dictionaries containing account information.
+
+        Returns:
+            None
+    """
     with open(file_name, 'w', newline='') as file:
         fieldnames = ["name", "pin", "balance", "accountNumber"]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -84,10 +121,21 @@ def write_accounts_data(file_name, accounts_data):
         writer.writerows(accounts_data)
 
 
-def checkBalance(accounts_data, pin, accountNumber):
+def checkBalance(accounts_data, pin, account_number):
+    """
+        Checks and displays the balance for a given account.
+
+        Args:
+            accounts_data (list): A list of dictionaries containing account information.
+            pin (int): The PIN associated with the account.
+            account_number (int): The account number for identification.
+
+        Returns:
+            None
+    """
     print("Checking balance, please hold on...")
     for row in accounts_data:
-        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == account_number:
             balance = float(row["balance"])
             speak(f"Your balance is: {balance}")
             print(f"Your balance is: {balance}")
@@ -98,10 +146,21 @@ def checkBalance(accounts_data, pin, accountNumber):
             break
 
 
-def withdrawCash(accounts_data, pin, accountNumber):
+def withdrawCash(accounts_data, pin, account_number):
+    """
+        Handles cash withdrawal from a specified account.
+
+        Args:
+            accounts_data (list): A list of dictionaries containing account information.
+            pin (int): The PIN associated with the account.
+            account_number (int): The account number for identification.
+
+        Returns:
+            None
+    """
     speak("You have chosen to withdraw cash.")
     for row in accounts_data:
-        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == account_number:
             available_balance = float(row["balance"])
             while True:
                 speak("Say or enter the amount you want to withdraw.")
@@ -128,10 +187,21 @@ def withdrawCash(accounts_data, pin, accountNumber):
             break
 
 
-def depositCash(accounts_data, pin, accountNumber):
+def depositCash(accounts_data, pin, account_number):
+    """
+        Handles cash deposit to a specified account.
+
+        Args:
+            accounts_data (list): A list of dictionaries containing account information.
+            pin (int): The PIN associated with the account.
+            account_number (int): The account number for identification.
+
+        Returns:
+            None
+    """
     speak("You have chosen to deposit cash.")
     for row in accounts_data:
-        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == account_number:
             while True:
                 speak("Say or enter the amount you want to deposit.")
                 print("Say or enter the amount you want to deposit:")
@@ -157,11 +227,22 @@ def depositCash(accounts_data, pin, accountNumber):
             break
 
 
-def changePin(accounts_data, pin, accountNumber):
+def changePin(accounts_data, pin, account_number):
+    """
+       Allows the user to change their PIN.
+
+       Args:
+           accounts_data (list): A list of dictionaries containing account information.
+           pin (int): The PIN associated with the account.
+           account_number (int): The account number for identification.
+
+       Returns:
+           None
+    """
     speak("You have chosen to change your PIN.")
     tries = 0
     for row in accounts_data:
-        if int(row["pin"]) == pin and int(row["accountNumber"]) == accountNumber:
+        if int(row["pin"]) == pin and int(row["accountNumber"]) == account_number:
             while tries < 3:
                 speak("Please enter your old 4-digit PIN.")
                 print("Please enter your old 4-digit PIN:")
@@ -219,6 +300,15 @@ def changePin(accounts_data, pin, accountNumber):
 
 
 def main():
+    """
+        Entry point of the ATM system program.
+
+        Manages user interaction and navigation within the ATM system.
+
+        Returns:
+            None
+    """
+    global account_number
     intro()
     wish()
 
@@ -228,20 +318,21 @@ def main():
 
         print("Few example accounts loaded, please select one from below:")
         print(accounts_data)
-        speak("Enter your 10-digit account number.")
-        accountNumberInput = input("Enter your 10-digit account number: ").strip()
+        speak("Say your 10-digit account number.")
+
+        accountNumberInput = inputCommand().strip()  # Trim spaces or unwanted characters
 
         if not accountNumberInput or not accountNumberInput.isdigit():
-            speak("Please enter a valid 10-digit account number.")
-            print("Please enter a valid 10-digit account number.")
+            speak("Please say a valid 10-digit account number.")
+            print("Please say a valid 10-digit account number.")
             continue
 
-        accountNumber = int(accountNumberInput)
+        account_number = int(accountNumberInput)
         attempts = 0
 
         user = None
         for row in accounts_data:
-            if int(row["accountNumber"]) == accountNumber:
+            if int(row["account_number"]) == account_number:
                 user = row["name"]
                 pin = int(row["pin"])
                 break
@@ -258,12 +349,12 @@ def main():
             print("Account number exists.")
             break
 
-    if len(str(accountNumber)) == 10:
+    if len(str(account_number)) == 10:
         speak("Please enter your 4-digit PIN number.")
         print("Please enter your 4-digit PIN number.")
         while True:
             try:
-                pin_input = inputCommand()
+                pin_input = inputCommand().strip()
                 pin = int(pin_input)
                 if len(str(pin)) == 4:
                     if pin == pin:
@@ -303,16 +394,16 @@ def main():
             ".................................................................................................................."
             ".....................")
 
-        option = inputCommand()
+        option = inputCommand().strip()
 
         if "withdraw" in option.lower() or "cash withdrawal" in option.lower():
-            withdrawCash(accounts_data, pin, accountNumber)
+            withdrawCash(accounts_data, pin, account_number)
         elif "deposit" in option.lower() or "cash deposit" in option.lower():
-            depositCash(accounts_data, pin, accountNumber)
+            depositCash(accounts_data, pin, account_number)
         elif "balance" in option.lower() or "balance inquiry" in option.lower():
-            checkBalance(accounts_data, pin, accountNumber)
+            checkBalance(accounts_data, pin, account_number)
         elif "change pin" in option.lower() or "change my pin" in option.lower():
-            changePin(accounts_data, pin, accountNumber)
+            changePin(accounts_data, pin, account_number)
         else:
             speak("Sorry! The command you entered does not exist, please try again.")
             print("Sorry! The command you entered does not exist, please try again.")
