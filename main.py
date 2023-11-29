@@ -319,7 +319,8 @@ def main():
         print(accounts_data)
         speak("Say your 10-digit account number.")
 
-        accountNumberInput = inputCommand().strip()  # Trim spaces or unwanted characters
+        # Trim spaces or unwanted characters and remove white spaces
+        accountNumberInput = inputCommand().strip().replace(" ", "")
 
         if not accountNumberInput or not accountNumberInput.isdigit():
             speak("Please say a valid 10-digit account number.")
@@ -353,7 +354,7 @@ def main():
         print("Please enter your 4-digit PIN number.")
         while True:
             try:
-                pin_input = inputCommand().strip()
+                pin_input = inputCommand().strip().replace(" ", "")
                 pin = int(pin_input)
                 if len(str(pin)) == 4:
                     if pin == pin:
