@@ -165,7 +165,7 @@ def withdrawCash(accounts_data, pin, account_number):
             while True:
                 speak("Say or enter the amount you want to withdraw.")
                 print("Say or enter the amount you want to withdraw:")
-                amount = inputCommand()
+                amount = inputCommand().strip()
                 try:
                     amount = int(amount)
                     if amount <= available_balance:
@@ -205,7 +205,7 @@ def depositCash(accounts_data, pin, account_number):
             while True:
                 speak("Say or enter the amount you want to deposit.")
                 print("Say or enter the amount you want to deposit:")
-                amount = inputCommand()
+                amount = inputCommand().strip()
                 try:
                     amount = int(amount)
                     if amount <= 20000:
@@ -246,7 +246,7 @@ def changePin(accounts_data, pin, account_number):
             while tries < 3:
                 speak("Please enter your old 4-digit PIN.")
                 print("Please enter your old 4-digit PIN:")
-                oldPin = inputCommand()
+                oldPin = inputCommand().strip()
                 try:
                     oldPin = int(oldPin)
                     if oldPin == pin:
@@ -308,7 +308,6 @@ def main():
         Returns:
             None
     """
-    global account_number
     intro()
     wish()
 
@@ -332,7 +331,7 @@ def main():
 
         user = None
         for row in accounts_data:
-            if int(row["account_number"]) == account_number:
+            if int(row["accountNumber"]) == account_number:
                 user = row["name"]
                 pin = int(row["pin"])
                 break
@@ -391,8 +390,8 @@ def main():
             "              ")
         speak("3. Balance Inquiry. 4. Change Pin")
         print(
-            ".................................................................................................................."
-            ".....................")
+            ".........................................................................................................."
+            ".............................")
 
         option = inputCommand().strip()
 
