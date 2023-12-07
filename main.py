@@ -29,7 +29,7 @@ engine.setProperty("voice", voices[0].id)
 
 def inputCommand():
     """
-        Recognizes and returns user input through speech or text.
+        Recognizes and returns user input through speech.
 
         Returns:
             str: The recognized input.
